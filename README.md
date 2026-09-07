@@ -41,6 +41,17 @@ Currently, NCPOR headquarters in Goa, India, has **zero live visual feedback** r
 
 ---
 
+PROJECT STURCTURE
+
+polartwin/
+├── package.json
+├── public/
+│   └── index.html
+├── src/
+│   ├── App.jsx        # main dashboard component
+│   └── index.js        # React entry point
+└── README.md
+
 ## 🚨 Why This Solution is Critical (Operational Impact)
 
 ### The Single-Window Resupply Ship
