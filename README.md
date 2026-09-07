@@ -1,262 +1,855 @@
-# PolarTwin: Real-Time Digital Twin for Remote Antarctic Station Management
+# 🛰️ PolarTwin
+### Real-Time Digital Twin for Remote Antarctic Station Management
 
-**PolarTwin** is a comprehensive, production-designed real-time Digital Twin platform developed to bridge the massive 12,000+ km geographic gap between India and its remote Antarctic research stations—**Maitri** and **Bharati**. 
+> **Smart India Hackathon 2026 — SIH26060**  
+> **Ministry of Earth Sciences (MoES) / National Centre for Polar and Ocean Research (NCPOR)**
 
-Created for the **Smart India Hackathon 2026 (Problem Statement ID: SIH26060)** under the **Ministry of Earth Sciences and National Centre for Polar and Ocean Research (NCPOR)**, PolarTwin replicates the physical environments, mechanical systems, and utility reserves of polar stations into a highly responsive virtual dashboard.
+**PolarTwin** is a Digital Twin platform designed to provide a unified remote-monitoring interface for India's Antarctic research stations — **Maitri** and **Bharati**.
 
-By combining ruggedized edge hardware, offline-first communication protocols, and a specialized high-performance time-series data pipeline, PolarTwin transforms highly isolated, reactive polar operations into a proactive, smart, and data-driven mission.
-
----
-
-## 📌 Table of Contents
-1. [The High-Stakes Antarctic Context](#-the-high-stakes-antarctic-context)
-2. [Why This Solution is Critical (Operational Impact)](#-why-this-solution-is-critical-operational-impact)
-3. [System Architecture & Data Flow](#-system-architecture--data-flow)
-4. [Detailed Modular Breakdown (Kya Kaise Kaam Karta Hai)](#-detailed-modular-breakdown-kya-kaise-kaam-karta-hai)
-5. [Core Innovation: Zero-Data-Loss Edge Pipeline](#-core-innovation-zero-data-loss-edge-pipeline)
-6. [Tech Stack Justification (Kyu Use Kar Rahe Hain)](#-tech-stack-justification-kyu-use-kar-rehe-hain)
-7. [Feasibility & Viability Analysis](#-feasibility--viability-analysis)
-8. [Implementation Status & Detailed Codebase Setup](#-implementation-status--detailed-codebase-setup)
-9. [Future Roadmap (Maitri-II & Production Integration)](#-future-roadmap-maitri-ii--production-integration)
+It brings station telemetry, energy status, environmental conditions, infrastructure health, logistics and operational alerts into a single dashboard so that critical conditions can be detected and acted upon remotely.
 
 ---
 
-## ❄️ The High-Stakes Antarctic Context
+## 🚀 Why PolarTwin?
 
-Antarctica is the coldest, windiest, and most isolated continent on Earth. India operates two primary research stations here:
+Antarctic research stations operate in one of the world's most isolated and extreme environments.
 
-### 1. Maitri Station (Inland, Schirmacher Oasis)
-*   **The Problem:** Originally constructed in 1989 with an intended operational lifespan of **10 years**, Maitri has now been functioning for **over 35 years**.
-*   **Structural Risks:** The wooden and steel framework suffers from extreme structural fatigue, rust, and wooden decay. 
-*   **Operational Inefficiencies:** The station operates on aging, fuel-inefficient diesel generators.
-*   **Environmental Hazards:** Extreme snow accumulation piles heavy structural loads on the wooden shells, and the old waste management systems are highly vulnerable to freezing and leakage.
+Physical access is limited, resupply is periodic, and critical infrastructure such as power generation, heating, communication and water systems must remain operational throughout the Antarctic winter.
 
-### 2. Bharati Station (Coastal, Larsmann Hills)
-*   **The Problem:** Bharati is located extremely close to the coast (just **~50 metres from the shoreline**), leaving it highly vulnerable to coastal erosion and shifting sea-ice hazards.
-*   **Extreme Weather:** The station regularly encounters ferocious polar winds and blizzards with gust speeds reaching up to **200 mph (320 km/h)**.
-*   **Power Dependability:** It relies entirely on three Combined Heat and Power (CHP) diesel generators. If these generators experience a mechanical breakdown, the station has extremely limited back-up heating or electrical supply.
+The central challenge is simple:
 
-### 3. The Central Bottleneck: No Real-Time Visibility
-Currently, NCPOR headquarters in Goa, India, has **zero live visual feedback** regarding the health of these stations. Operations are blind. NCPOR depends entirely on daily manual log updates, emails, or high-cost satellite phone calls from the on-site crew. If a critical component fails during the dark polar winter, India only finds out *after* the hazard has occurred.
+> **How can India continuously understand the condition of a remote Antarctic station without physically being there?**
+
+PolarTwin addresses this through a **Digital Twin + IoT telemetry + satellite communication + intelligent alerting** architecture.
 
 ---
 
-PROJECT STURCTURE
-'''
-polartwin/                                             |
-├── package.json                                       |
-├── public/                                            |
-│   └── index.html                                     |
-├── src/                                               |
-│   ├── App.jsx        # main dashboard component      |
-│   └── index.js        # React entry point            |
-└── README.md                                          |
-'''
+# 🎯 Problem Statement
 
+### SIH26060 — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations
 
-## 🚨 Why This Solution is Critical (Operational Impact)
+India operates two major Antarctic research stations:
 
-### The Single-Window Resupply Ship
-The primary logistical bottleneck of Antarctic research is that resupply missions occur **only once a year**. The cargo vessel (such as the *MV Vasiliy Golovnin*) embarks on a gruelling **30-day voyage** from India to Antarctica carrying fuel, food, medicine, and critical mechanical spare parts.
+- 🏔️ **Maitri** — Schirmacher Oasis
+- 🌊 **Bharati** — Larsemann Hills
 
-*   **Before PolarTwin (Reactive & Vulnerable):** If a vital HVAC heating coil or generator bearing failed mid-winter, engineers had no way to acquire the specific replacement part. They had to wait up to **10–11 months** for the next annual ship, resulting in hazardous conditions or the complete abandonment of scientific experiments.
-*   **After PolarTwin (Proactive & Safe):** The system continuously monitors micro-vibrations, thermal changes, and operational efficiency. It predicts weeks in advance *which* component is wearing down. This allows NCPOR to procure the exact spare parts and load them onto the single annual resupply ship, preventing catastrophic system failures.
+The stations require continuous monitoring of:
+
+- ⚡ Energy & power systems
+- 🌡️ Environmental conditions
+- 🔧 Infrastructure & equipment
+- 📦 Critical supplies & logistics
+- 🚨 Operational risks
+
+PolarTwin aims to convert these physical station conditions into a **live digital representation** accessible from India.
 
 ---
 
-## 📐 System Architecture & Data Flow
+# 💡 Our Solution
 
-Below is the clean, standard Black-and-White operational flow diagram for the PolarTwin architecture (as saved in `polartwin_simple_flowchart.png` in the project files):
+PolarTwin follows a simple operational concept:
 
-```
-+---------------------------------------------------------------------------------+
-|                               ANTARCTIC STATION                                 |
-|                                                                                 |
-|  [ Ruggedized IoT Sensors ] ---> [ ESP32 Microcontroller Gateway ]             |
-|  (Power, Wind, Temp, Vib)               |                                       |
-|                                         v                                       |
-|                             < Satellite Connection? >                           |
-|                              /                     \                            |
-|                            YES                      NO                          |
-|                            /                         \                          |
-|                           v                           v                         |
-|                 [ Transmit Telemetry ]      [ Local Buffer (SD/Flash) ]         |
-|                           |                           |                         |
-|                           |                           | (On Reconnection)       |
-|                           | <-------------------------+                         |
-+---------------------------|-----------------------------------------------------+
-                            v
-                    (Satellite Link)
-                            |
-+---------------------------|-----------------------------------------------------+
-|                      NCPOR CENTRAL HEADQUARTERS (INDIA)                         |
-|                           |                                                     |
-|                           v                                                     |
-|                 [ Node.js API Backend ] <---> [ Rule-Based Alert Engine ]       |
-|                           |                                  |                  |
-|                           v                                  v                  |
-|               [( InfluxDB Time-Series )]           [[ Visual/Audio Alarm ]]     |
-|                           |                                                     |
-|                           v                                                     |
-|               [ React 18 Live Dashboard ]                                       |
-|                                                                                 |
-+---------------------------------------------------------------------------------+
+```mermaid
+flowchart LR
+
+A["🏔️ Antarctic Station"] --> B["📡 Sensors"]
+B --> C["🧠 Edge Gateway"]
+C --> D["🛰️ Satellite Link"]
+D --> E["🇮🇳 India / NCPOR"]
+E --> F["⚙️ Data Processing"]
+F --> G["🧬 Digital Twin"]
+G --> H["📊 Monitoring Dashboard"]
+G --> I["🚨 Alert Engine"]
+I --> J["👨‍💻 Operator Action"]
+J --> G
 ```
 
----
+### The platform provides:
 
-## 📦 Detailed Modular Breakdown (Kya Kaise Kaam Karta Hai)
-
-The virtual Digital Twin tracks operations across **four dedicated functional modules**:
-
-### 1. Energy Module (Power & Utility Tracking)
-*   **How it works:** Flow sensors monitor fuel intake, vibration sensors monitor alternator bearings, and Hall-effect sensors track output current/voltage from the 3 Combined Heat and Power (CHP) units. Smart battery monitoring chips track the charge/discharge rates of the backup batteries.
-*   **Why we need it:** In sub-zero temperatures, power is life. If the CHP generators fail, the station freezes within hours.
-*   **Impact:** Gives real-time visibility into power generation (kW), remaining fuel hours, and instant notification if backup battery banks are draining too quickly.
-
-### 2. Environment Module (Exterior Weather Security)
-*   **How it works:** Ultrasonic anemometers (with no moving parts to prevent freezing) track wind speeds up to 200 mph. Heated temperature sensors log ambient polar cold.
-*   **Why we need it:** Bharati is exposed to coastal storms, while Maitri faces heavy snow load accumulation.
-*   **Impact:** Real-time blizzards are logged. If wind speeds exceed safe operational limits, the system triggers shelter-in-place warnings, protects external structures, and locks down outdoor machinery.
-
-### 3. Infrastructure Module (Structural Health Analytics)
-*   **How it works:** Piezoelectric vibration sensors are welded to the steel pillar foundations of Bharati and the wooden support frames of Maitri. Flow-rate and pressure sensors monitor the water-treatment lines and HVAC heating loops.
-*   **Why we need it:** Maitri is decaying structurally, and Bharati faces heavy coastal soil shifts.
-*   **Impact:** Detects abnormal frequency shifts or pipe pressure drops, predicting structural fatigue or freezing pipes before they burst.
-
-### 4. Logistics Module (Critical Resource Estimator)
-*   **How it works:** Digital weight scales, ultrasonic fluid level sensors in fuel tanks, and computerized inventory tracking input log food, medicines, and diesel reserves.
-*   **Why we need it:** Due to the single-window resupply, a shortage of winter fuel or essential food is fatal.
-*   **Impact:** Generates a real-time "Days of Survival" depletion rate. If the food or fuel depletion curve accelerates abnormally, alerts are flagged to throttle consumption.
+- Real-time-style station monitoring
+- Station-specific telemetry
+- Energy monitoring
+- Environmental monitoring
+- Infrastructure health tracking
+- Logistics & supply monitoring
+- Threshold-based alerts
+- Historical telemetry visualization
+- Offline-first data buffering concept
+- Future predictive-maintenance integration
 
 ---
 
-## ⚡ Core Innovation: Zero-Data-Loss Edge Pipeline
+# 🧬 What is the PolarTwin Digital Twin?
 
-Antarctica’s polar blizzards and extreme solar storms frequently block satellite communication links, creating frequent network outages.
+The Digital Twin represents the operational state of an Antarctic station inside a virtual environment.
 
-### The ESP32 "Offline-First" Buffer Mechanism
-1.  **Continuous Data Capture:** Under normal conditions, the **ESP32 microcontroller** receives telemetry from the sensors and transmits it via satellite to India.
-2.  **Detection of Outage:** The ESP32 firmware continuously performs handshake ping checks with the satellite uplink. If a ping fails, it detects that the connection is down.
-3.  **Local Storage Cache:** Instead of dropping the data, the ESP32 activates its **local buffering state**. It logs every timestamped sensor reading directly to its local flash memory or an SPI-connected microSD card slot.
-4.  **Automatic Resync:** The ESP32 background thread keeps attempting to ping the network. The instant the connection is restored, it initiates a high-speed **burst sync** to push all cached sequential logs to the Node.js API, filling the gaps in the InfluxDB database completely.
-5.  **Lightweight Payload Structure:** Telemetry packets are structured in a highly compressed key-value binary or short JSON format (e.g., `{"t":178902123,"s1":-21.5,"g1_v":14.2}`) to ensure transmission consumes minimal satellite bandwidth.
+```mermaid
+flowchart TD
 
----
+A["🧬 POLARTWIN DIGITAL TWIN"]
 
-## 🛠️ Tech Stack Justification (Kyu Use Kar Rahe Hain)
+A --> B["⚡ ENERGY"]
+A --> C["🌡️ ENVIRONMENT"]
+A --> D["🔧 INFRASTRUCTURE"]
+A --> E["📦 LOGISTICS"]
 
-| Technology | Role in System | Kyu Use Kiya? (The Engineering Reasoning) |
-| :--- | :--- | :--- |
-| **ESP32** | Edge microcontroller gate | Low-cost, rugged, operates down to -40°C, low power draw, and built-in flash memory support for deep offline data buffering. |
-| **React 18** | Live Control Dashboard | React’s Virtual DOM and highly optimized component re-rendering allow it to display hundreds of rapid sensor updates smoothly without UI lagging. |
-| **Recharts** | Telemetry Visualization | Uses SVG-based responsive rendering to handle live, interactive time-series charts (vibration trends, temperature drops) in real-time. |
-| **Node.js + Express** | High-Throughput API Gateway | Built on V8’s non-blocking, asynchronous event-driven I/O model. It easily handles thousands of simultaneous socket/HTTP connections from multiple polar gateways. |
-| **InfluxDB** | Time-Series Database | Traditional SQL (like MySQL) gets slow when writing millions of continuous sensor logs. InfluxDB is specifically engineered for chronological data, enabling lightning-fast writes and compressed storage. |
-| **Lucide React** | Dashboard UI Iconography | Extremely lightweight vector icons that render instantly, keeping the overall dashboard payload small for remote viewing. |
+B --> B1["Power Generation"]
+B --> B2["Battery Reserve"]
+B --> B3["Fuel Status"]
 
----
+C --> C1["Temperature"]
+C --> C2["Wind Speed"]
+C --> C3["Weather Conditions"]
 
-## 📊 Feasibility & Viability Analysis
+D --> D1["Equipment Health"]
+D --> D2["HVAC"]
+D --> D3["Water Systems"]
+D --> D4["Communication Systems"]
 
-### Feasibility: Why is this practical to build *today*?
-*   **No Heavy Hardware Dependency:** Both Maitri and Bharati already have operational satellite terminal systems installed. PolarTwin uses this existing transmission network, requiring zero additional satellite launches.
-*   **Standardized Interfaces:** ESP32 and industrial sensors are off-the-shelf, cheap, and easily replaceable, meaning they can be easily packed onto the annual ship.
-*   **Optimized Bandwidth Consumption:** By compressing data to raw telemetry instead of high-resolution visual feeds, it operates flawlessly on low-bandwidth polar satellite channels.
+E --> E1["Food"]
+E --> E2["Fuel"]
+E --> E3["Medical Supplies"]
+E --> E4["Spare Parts"]
+```
 
-### Viability: Long-term Operations
-*   **Predictive Operations:** Instead of fixing broken parts, the "Rule-Based Alert Engine" matches current vibrations with historical breakdown curves. Engineers know a pump will fail *before* it actually stops, optimizing the maintenance schedule.
-*   **Future Proofing (Maitri-II):** India is constructing **Maitri-II by 2029** to replace the old station. Maitri-II is designed to be a highly modern, automated station. PolarTwin is designed with an API-first approach, meaning it can immediately plug into the advanced sensors of Maitri-II without rewriting the codebase.
+This allows operators to move from **isolated sensor readings** to a unified operational picture.
 
 ---
 
-## 💻 Implementation Status & Detailed Codebase Setup
+# 🛰️ System Architecture
 
-### Current Prototype State
-*   The system currently runs on a high-fidelity **React 18 Frontend**.
-*   Telemetry data is simulated using an active local generator loop inside `App.jsx` to mimic live sensor feeds from Maitri and Bharati (mocking temperatures, fuel drops, wind gusts, and structural vibrations).
-*   Visual indicators and status metrics automatically update dynamically.
+The proposed production architecture connects sensors deployed at the station with the monitoring dashboard in India.
 
-### Local Installation Guide
+```mermaid
+flowchart TB
 
-#### 1. Prerequisites
-Ensure you have **Node.js (v18 or higher)** and **npm** installed on your system.
+subgraph ANTARCTICA["🏔️ ANTARCTIC STATION"]
+
+S1["⚡ Power Sensors"]
+S2["🌡️ Temperature Sensors"]
+S3["💨 Wind Sensors"]
+S4["〰️ Vibration Sensors"]
+S5["📦 Inventory Sensors"]
+
+S1 --> G
+S2 --> G
+S3 --> G
+S4 --> G
+S5 --> G
+
+G["🧠 Edge Gateway"]
+
+end
+
+G --> N{"📡 Satellite Available?"}
+
+N -->|YES| T["📤 Transmit Telemetry"]
+N -->|NO| B["💾 Local Data Buffer"]
+
+B --> R["🔄 Retry Connection"]
+R --> N
+
+T --> SAT["🛰️ Satellite Uplink"]
+
+subgraph INDIA["🇮🇳 INDIA / NCPOR"]
+
+SAT --> API["⚙️ Node.js API"]
+API --> DB["📈 InfluxDB"]
+DB --> ENGINE["🚨 Rule-Based Alert Engine"]
+DB --> DASH["📊 React Dashboard"]
+ENGINE --> ALERT["🔔 Alerts & Notifications"]
+
+end
+
+DASH --> OP["👨‍💻 NCPOR Operator"]
+ALERT --> OP
+OP --> ACT["🛠️ Operational Decision"]
+```
+
+---
+
+# 🔄 End-to-End Data Flow
+
+The complete telemetry journey can be understood as:
+
+```mermaid
+flowchart LR
+
+A["Sensor Reading"]
+--> B["Edge Gateway"]
+--> C{"Connection?"}
+
+C -->|Available| D["Telemetry Packet"]
+C -->|Unavailable| E["Local Buffer"]
+
+E --> F["Connection Restored"]
+F --> D
+
+D --> G["Satellite Uplink"]
+G --> H["India Ground Infrastructure"]
+H --> I["Node.js API"]
+I --> J["InfluxDB"]
+J --> K["Digital Twin"]
+K --> L["Dashboard"]
+
+K --> M["Alert Engine"]
+M --> N{"Threshold Exceeded?"}
+
+N -->|No| O["✅ Continue Monitoring"]
+N -->|Yes| P["🚨 Generate Alert"]
+
+P --> Q["Operator Response"]
+```
+
+---
+
+# 📊 Dashboard Modules
+
+PolarTwin's dashboard is organized around four major operational domains.
+
+---
+
+## ⚡ 1. Energy Monitoring
+
+The Energy module provides visibility into the station's power ecosystem.
+
+### Monitored parameters
+
+- Power generation
+- Power consumption
+- Battery reserve
+- Generator condition
+- Fuel availability
+- Energy trends
+
+```mermaid
+flowchart TD
+
+A["⚡ Energy Telemetry"]
+
+A --> B["Power Generation"]
+A --> C["Power Consumption"]
+A --> D["Battery Reserve"]
+A --> E["Generator Health"]
+A --> F["Fuel Status"]
+
+B --> G["📊 Energy Dashboard"]
+C --> G
+D --> G
+E --> G
+F --> G
+
+G --> H{"⚠️ Abnormal Condition?"}
+
+H -->|No| I["Normal Operation"]
+H -->|Yes| J["🚨 Energy Alert"]
+```
+
+---
+
+# 🌡️ 2. Environment Monitoring
+
+Environmental conditions directly influence station operations.
+
+### Parameters
+
+- Temperature
+- Wind speed
+- Weather conditions
+- Environmental trends
+- Station-specific thresholds
+
+```mermaid
+flowchart LR
+
+A["🌡️ Environmental Sensors"]
+
+A --> B["Temperature"]
+A --> C["Wind"]
+A --> D["Weather Data"]
+
+B --> E["Telemetry Processing"]
+C --> E
+D --> E
+
+E --> F{"Threshold Check"}
+
+F -->|Normal| G["🟢 Normal"]
+F -->|Warning| H["🟡 Warning"]
+F -->|Critical| I["🔴 Critical"]
+
+H --> J["Operator Notification"]
+I --> J
+```
+
+---
+
+# 🔧 3. Infrastructure Health
+
+The Infrastructure module focuses on critical station equipment.
+
+### Example systems
+
+- HVAC / thermal control
+- Water treatment
+- Communication systems
+- Generator systems
+- Structural monitoring
+
+```mermaid
+flowchart TD
+
+A["🔧 Infrastructure"]
+
+A --> B["HVAC"]
+A --> C["Water Treatment"]
+A --> D["Communication"]
+A --> E["Generator"]
+A --> F["Structural Monitoring"]
+
+B --> G["Health Score"]
+C --> G
+D --> G
+E --> G
+F --> G
+
+G --> H{"Equipment Condition"}
+
+H -->|Healthy| I["🟢 Operational"]
+H -->|Degrading| J["🟡 Maintenance Required"]
+H -->|Critical| K["🔴 Immediate Attention"]
+
+J --> L["Maintenance Planning"]
+K --> L
+```
+
+---
+
+# 📦 4. Logistics & Supply Monitoring
+
+Because Antarctic resupply is highly constrained, resource visibility is critical.
+
+PolarTwin tracks:
+
+- 🛢️ Diesel fuel
+- 🍱 Food reserves
+- 💊 Medical supplies
+- 🔩 Spare parts
+- 📈 Consumption trends
+- ⏳ Estimated remaining availability
+
+```mermaid
+flowchart LR
+
+A["📦 Supply Data"]
+
+A --> B["Fuel"]
+A --> C["Food"]
+A --> D["Medical"]
+A --> E["Spare Parts"]
+
+B --> F["Consumption Analysis"]
+C --> F
+D --> F
+E --> F
+
+F --> G["📈 Depletion Trend"]
+
+G --> H{"Reserve Level"}
+
+H -->|Healthy| I["🟢 Normal"]
+H -->|Low| J["🟡 Warning"]
+H -->|Critical| K["🔴 Critical"]
+
+J --> L["Resupply Planning"]
+K --> L
+```
+
+---
+
+# 🚨 Intelligent Alert Engine
+
+PolarTwin uses a threshold-based alert mechanism in the current prototype.
+
+The system evaluates incoming telemetry and determines whether an operational condition requires attention.
+
+```mermaid
+flowchart TD
+
+A["📡 Incoming Telemetry"]
+
+A --> B["Validate Data"]
+B --> C["Update Digital Twin"]
+C --> D["Evaluate Thresholds"]
+
+D --> E{"Condition Normal?"}
+
+E -->|YES| F["🟢 Continue Monitoring"]
+
+E -->|NO| G{"Severity"}
+
+G -->|Warning| H["🟡 Warning Alert"]
+G -->|Critical| I["🔴 Critical Alert"]
+
+H --> J["Dashboard Notification"]
+I --> J
+
+J --> K["👨‍💻 Operator Review"]
+K --> L["🛠️ Corrective Action"]
+```
+
+### Current alert categories
+
+- 🔋 Low battery
+- 💨 High wind
+- 🥶 Extreme temperature
+- 🔧 Equipment health degradation
+- 🚨 Critical equipment condition
+- 📦 Low supply reserve
+
+---
+
+# 💾 Offline-First Data Pipeline
+
+One of PolarTwin's key production concepts is **local buffering during communication outages**.
+
+Instead of immediately discarding telemetry when the satellite connection is unavailable, the edge gateway can temporarily store timestamped readings.
+
+```mermaid
+flowchart TD
+
+A["📡 Sensor Reading"]
+--> B["🧠 Edge Gateway"]
+
+B --> C{"Satellite Link Available?"}
+
+C -->|YES| D["📤 Send Telemetry"]
+C -->|NO| E["💾 Store Locally"]
+
+E --> F["🔁 Periodic Connection Check"]
+
+F --> G{"Connection Restored?"}
+
+G -->|NO| F
+G -->|YES| H["📦 Prepare Buffered Data"]
+
+H --> I["📤 Batch / Burst Synchronization"]
+I --> J["🇮🇳 India Backend"]
+
+D --> J
+
+J --> K["📈 Time-Series Database"]
+K --> L["🧬 Digital Twin"]
+```
+
+### Why this matters
+
+The objective is to prevent communication interruptions from becoming permanent telemetry gaps.
+
+> **Store locally → reconnect → synchronize → restore the timeline**
+
+---
+
+# 🧠 Station-Specific Intelligence
+
+Maitri and Bharati do not have identical operational environments.
+
+Therefore, PolarTwin is designed around **station-specific monitoring rules**.
+
+```mermaid
+flowchart LR
+
+A["🛰️ PolarTwin"]
+
+A --> B["🏔️ Maitri Profile"]
+A --> C["🌊 Bharati Profile"]
+
+B --> B1["Structural Monitoring"]
+B --> B2["Energy Monitoring"]
+B --> B3["Temperature / Snow Conditions"]
+
+C --> C1["Wind Monitoring"]
+C --> C2["Coastal Environment"]
+C --> C3["Energy Monitoring"]
+
+B1 --> D["Station-Specific Thresholds"]
+B2 --> D
+B3 --> D
+
+C1 --> D
+C2 --> D
+C3 --> D
+
+D --> E["🚨 Customized Alerts"]
+```
+
+This makes the platform adaptable rather than treating both stations as identical environments.
+
+---
+
+# 🖥️ Current Prototype
+
+The current implementation is a **React-based working dashboard prototype**.
+
+### Implemented
+
+- ✅ React 18 dashboard
+- ✅ Maitri / Bharati station switching
+- ✅ Energy monitoring interface
+- ✅ Environment monitoring interface
+- ✅ Infrastructure health interface
+- ✅ Logistics monitoring interface
+- ✅ Dynamic telemetry simulation
+- ✅ Threshold-based alert system
+- ✅ Warning / Critical alert states
+- ✅ Interactive charts using Recharts
+- ✅ Responsive dashboard UI
+- ✅ Lucide-based interface icons
+
+### Demo Data
+
+The current dashboard uses **simulated telemetry** to demonstrate how live station data would behave.
+
+> ⚠️ **Important:** The displayed telemetry is demo/simulated data and does not represent live Antarctic measurements.
+
+---
+
+# 🏗️ Current vs Production Architecture
+
+```mermaid
+flowchart LR
+
+A["🧪 Current Prototype"]
+
+A --> A1["React 18"]
+A --> A2["Recharts"]
+A --> A3["Simulated Telemetry"]
+A --> A4["Local Alert Logic"]
+
+B["🚀 Production Target"]
+
+B --> B1["IoT Sensors"]
+B --> B2["Edge Gateway"]
+B --> B3["Satellite Link"]
+B --> B4["Node.js API"]
+B --> B5["InfluxDB"]
+B --> B6["Alert Engine"]
+B --> B7["React Dashboard"]
+
+A --> C["🔄 Integration Roadmap"]
+C --> B
+```
+
+This distinction is intentional:
+
+**The prototype demonstrates the user experience and monitoring logic, while the production architecture defines how real station telemetry can eventually be integrated.**
+
+---
+
+# 🗂️ Project Structure
+
+```mermaid
+flowchart TD
+
+A["🛰️ polartwin"]
+
+A --> B["📄 package.json"]
+A --> C["📁 public"]
+A --> D["📁 src"]
+A --> E["📄 README.md"]
+
+C --> C1["📄 index.html"]
+
+D --> D1["⚛️ App.jsx"]
+D --> D2["📄 index.js"]
+
+D1 --> D3["📊 Dashboard"]
+D1 --> D4["⚡ Energy"]
+D1 --> D5["🌡️ Environment"]
+D1 --> D6["🔧 Infrastructure"]
+D1 --> D7["📦 Logistics"]
+D1 --> D8["🚨 Alerts"]
+```
+
+### Simplified structure
+
+```text
+polartwin/
+│
+├── package.json
+│
+├── public/
+│   └── index.html
+│
+├── src/
+│   ├── App.jsx
+│   └── index.js
+│
+└── README.md
+```
+
+---
+
+# 🛠️ Technology Stack
+
+```mermaid
+flowchart LR
+
+A["🧬 PolarTwin"]
+
+A --> B["Frontend"]
+A --> C["Data Visualization"]
+A --> D["Backend — Planned"]
+A --> E["Database — Planned"]
+A --> F["Edge Hardware — Planned"]
+
+B --> B1["React 18"]
+C --> C1["Recharts"]
+B --> B2["Lucide React"]
+
+D --> D1["Node.js"]
+D --> D2["Express"]
+
+E --> E1["InfluxDB"]
+
+F --> F1["IoT Sensors"]
+F --> F2["Edge Gateway"]
+F --> F3["Satellite Communication"]
+```
+
+| Technology | Role |
+|---|---|
+| **React 18** | Dashboard interface |
+| **Recharts** | Telemetry visualization |
+| **Lucide React** | UI icons |
+| **Node.js + Express** | Planned telemetry API |
+| **InfluxDB** | Planned time-series storage |
+| **IoT Sensors** | Planned station telemetry |
+| **Edge Gateway** | Planned local processing & buffering |
+| **Satellite Link** | Planned remote telemetry transmission |
+
+---
+
+# 🔄 Development Roadmap
+
+```mermaid
+flowchart LR
+
+A["Phase 1<br/>🧪 Prototype"]
+--> B["Phase 2<br/>⚙️ Backend"]
+
+B --> C["Phase 3<br/>📡 IoT Integration"]
+
+C --> D["Phase 4<br/>🛰️ Satellite Integration"]
+
+D --> E["Phase 5<br/>🏔️ Field Deployment"]
+
+E --> F["Phase 6<br/>🧠 Advanced Analytics"]
+```
+
+### Phase 1 — Prototype
+- React dashboard
+- Simulated telemetry
+- Charts
+- Alert logic
+- Station switching
+
+### Phase 2 — Backend Integration
+- Node.js / Express API
+- Authentication
+- Telemetry ingestion
+- InfluxDB storage
+
+### Phase 3 — Hardware Integration
+- IoT sensor network
+- Edge gateway
+- Local data buffering
+- Sensor health monitoring
+
+### Phase 4 — Communication Integration
+- Satellite telemetry
+- Low-bandwidth payload optimization
+- Automatic synchronization
+
+### Phase 5 — Field Deployment
+- Ruggedized hardware
+- Environmental testing
+- Station integration
+- Operational validation
+
+### Phase 6 — Advanced Analytics
+- Historical anomaly detection
+- Predictive maintenance
+- Resource forecasting
+- Advanced operational intelligence
+
+---
+
+# 🔮 Future Vision
+
+PolarTwin is designed to evolve from a monitoring dashboard into a complete remote station-management platform.
+
+```mermaid
+flowchart TD
+
+A["🛰️ PolarTwin"]
+
+A --> B["Real-Time Monitoring"]
+A --> C["Predictive Maintenance"]
+A --> D["Resource Forecasting"]
+A --> E["Anomaly Detection"]
+A --> F["Remote Operations"]
+A --> G["Maitri-II Integration"]
+
+B --> H["🧠 Unified Polar Operations Platform"]
+C --> H
+D --> H
+E --> H
+F --> H
+G --> H
+```
+
+The long-term vision is to create a reusable digital infrastructure layer that can support both existing stations and future generations of Antarctic research infrastructure.
+
+---
+
+# 💻 Installation & Local Setup
+
+## 1. Prerequisites
+
+Install:
+
+- Node.js v18+
+- npm
+
+Verify:
 
 ```bash
-# Verify installations
 node -v
 npm -v
 ```
 
-#### 2. Clone and Setup Repository
-Clone this repository to your local computer and enter the directory:
+---
+
+## 2. Clone Repository
 
 ```bash
 git clone https://github.com/kailashramawat223-dot/POLARTWIN.git
+```
+
+```bash
 cd POLARTWIN
 ```
 
-#### 3. Install Required Dependencies
-Install the frontend packages including React, Recharts, and Lucide React:
+---
+
+## 3. Install Dependencies
 
 ```bash
 npm install
 ```
 
-#### 4. Run the Dashboard Locally
-Start the development server:
+---
+
+## 4. Start the Dashboard
 
 ```bash
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your web browser to view the active live Digital Twin dashboard.
+Open:
+
+```text
+http://localhost:3000
+```
 
 ---
 
-## 🗺️ Future Roadmap (Transitioning to Production)
+# 🎯 Expected Workflow
 
-To move this highly functional simulated prototype into a live, industrial-grade polar monitoring system:
+```mermaid
+flowchart LR
 
+A["🏔️ Station"]
+--> B["📡 Sensors"]
+--> C["🧠 Edge Processing"]
+--> D["🛰️ Communication"]
+--> E["🇮🇳 NCPOR"]
+--> F["📊 PolarTwin"]
+--> G["🚨 Alerts"]
+--> H["👨‍💻 Decision"]
 ```
-[ Phase 1: Prototype ] ➔ [ Phase 2: Backend Integration ] ➔ [ Phase 3: Hardware Field Test ]
-(Local Simulation)       (Express API + InfluxDB Logs)      (ESP32 Deployed in Antarctica)
-```
 
-1.  **Replace Mock Loops with API Calls:** Modify the React telemetry handler to fetch data from the Node.js server via Axios:
-    ```javascript
-    // src/services/telemetry.js
-    import axios from 'axios';
-    export const fetchLiveTelemetry = async () => {
-      const response = await axios.get('https://api.polartwin.ncpor.res.in/v1/telemetry');
-      return response.data;
-    };
-    ```
-2.  **Spin up the Express + InfluxDB Backend:** Set up a secure Node.js backend to ingest IoT packets and store them in InfluxDB:
-    ```javascript
-    // backend/server.js
-    const { InfluxDB, Point } = require('@influxdata/influxdb-client');
-    const express = require('express');
-    const app = express();
-    
-    const client = new InfluxDB({ url: 'http://localhost:8086', token: process.env.INFLUX_TOKEN });
-    const writeApi = client.getWriteApi(process.env.INFLUX_ORG, process.env.INFLUX_BUCKET);
-    
-    app.post('/api/telemetry', express.json(), (req, res) => {
-      const { station, temp, wind, fuel } = req.body;
-      const point = new Point('telemetry')
-        .tag('station', station)
-        .floatField('temperature', temp)
-        .floatField('wind_speed', wind)
-        .floatField('fuel_level', fuel);
-      writeApi.writePoint(point);
-      res.status(200).send('Logged successfully');
-    });
-    ```
-3.  **Implement Control-Room Authentication:** Integrate OAuth2 and Multi-Factor Authentication (MFA) to ensure only authorized NCPOR operators can view or send emergency override commands back to the station.
-4.  **Hardware Enclosure Development:** Build hermetically sealed, IP67-rated heated enclosures for the ESP32 edge gateways to protect the silicon chips from the extreme Antarctic atmospheric moisture and thermal shocks.
+**Monitor → Detect → Alert → Decide → Act**
 
 ---
 
-### 🇮🇳 PolarTwin: Securing India's Scientific Frontiers in the Coldest Desert
-*Developed with dedication for the Smart India Hackathon 2026.*
+# 🌍 Impact
+
+PolarTwin aims to improve Antarctic station operations through:
+
+### 🛡️ Safety
+Earlier visibility into hazardous environmental and equipment conditions.
+
+### ⚡ Reliability
+Continuous monitoring of critical energy and infrastructure systems.
+
+### 📦 Logistics
+Better understanding of resource consumption and resupply requirements.
+
+### 🔬 Scientific Continuity
+Reduced operational disruptions to scientific activities.
+
+### 🇮🇳 Strategic Capability
+A reusable digital monitoring framework for India's Antarctic infrastructure.
+
+---
+
+# 🇮🇳 Built for India's Polar Future
+
+PolarTwin is designed around a simple principle:
+
+> **The station may be thousands of kilometres away, but its operational state should never feel invisible.**
+
+By combining **Digital Twin technology, telemetry, edge computing, satellite communication and intelligent alerting**, PolarTwin creates a foundation for smarter and safer remote Antarctic operations.
+
+---
+
+## 👨‍💻 Smart India Hackathon 2026
+
+**Problem Statement:** SIH26060  
+**Organization:** Ministry of Earth Sciences / NCPOR  
+**Theme:** Smart Automation  
+**Category:** Software  
+
+### 🛰️ PolarTwin
+
+**Monitor the station. Understand the risk. Act before failure.**
+
+---
+
+## 📚 References
+
+- National Centre for Polar and Ocean Research (NCPOR)
+- Ministry of Earth Sciences (MoES)
+- Smart India Hackathon
+- Government publications related to Indian Antarctic expeditions
+- Digital Twin concepts and industrial monitoring architectures
+
+---
+
+## ⚠️ Prototype Disclaimer
+
+PolarTwin is currently a **demonstration/prototype system**.
+
+Telemetry displayed in the dashboard is simulated and is intended to demonstrate the proposed monitoring, visualization and alerting workflow.
+
+Real-world deployment would require:
+
+- Certified Antarctic-grade sensors
+- Validated communication infrastructure
+- Hardware environmental testing
+- Secure backend infrastructure
+- NCPOR integration
+- Field validation
+- Operational safety certification
