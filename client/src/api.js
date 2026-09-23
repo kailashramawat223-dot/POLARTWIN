@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5001/api';
+// In dev this falls back to localhost. In production (Vercel), set the
+// VITE_API_URL environment variable to your deployed Render backend URL,
+// e.g. https://polartwin-server.onrender.com/api
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 const client = axios.create({ baseURL: BASE_URL });
 

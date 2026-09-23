@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getStation, getAlerts } from '../api';
+import { useAuth } from '../context/AuthContext';
 import { PanelLoading, PanelError } from '../components/Shared';
 import StatusBadge from '../components/StatusBadge';
 import StationMap from '../components/StationMap';
@@ -20,6 +21,13 @@ export default function StationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('Overview');
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +62,15 @@ export default function StationPage() {
             <div className="text-sm text-muted">{station.location} &middot; est. {station.established}</div>
           </div>
           <div className="text-right">
-            <StatusBadge status={station.status} />
+            <div className="flex items-center justify-end gap-3">
+              <StatusBadge status={station.status} />
+              <button
+                onClick={handleLogout}
+                className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted hover:text-slate-100 hover:border-ice transition-colors"
+              >
+                Log out
+              </button>
+            </div>
             <div className="text-xs text-muted mt-2">
               Last updated {new Date(station.lastUpdated).toLocaleTimeString()}
             </div>

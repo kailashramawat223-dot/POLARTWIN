@@ -20,7 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET = 'polartwin-dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'polartwin-dev-secret-change-in-production';
 const PORT = process.env.PORT || 5001;
 
 // ---------------------------------------------------------------------------

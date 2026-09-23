@@ -46,7 +46,7 @@ const STATIONS = Object.keys(stations);
 
 const TICK_MS = 4000; // simulated sensor sampling rate
 const HEARTBEAT_MS = 45 * 1000; // force a transmission at least this often, even with no change
-const ALERT_COOLDOWN_MS = 25 * 1000; // don't re-fire the same alert rule more than once per this window
+const ALERT_COOLDOWN_MS = 90 * 1000; // don't re-fire the same alert rule more than once per this window
 
 // ---------------------------------------------------------------------------
 // Per-metric simulation config: baseline is seeded from the existing data so
@@ -58,15 +58,15 @@ const REVERSION_RATE = 0.15;
 
 function genMetricConfig(baselineLoad, baselineTemp) {
   return {
-    load: { baseline: baselineLoad, wander: 1, deadband: 3, spikeChance: 0.02, spike: () => 88 + Math.random() * 12 },
-    tempC: { baseline: baselineTemp, wander: 0.6, deadband: 2, spikeChance: 0.02, spike: () => 82 + Math.random() * 10 },
+    load: { baseline: baselineLoad, wander: 1, deadband: 3, spikeChance: 0.004, spike: () => 88 + Math.random() * 12 },
+    tempC: { baseline: baselineTemp, wander: 0.6, deadband: 2, spikeChance: 0.004, spike: () => 82 + Math.random() * 10 },
   };
 }
 
 function envMetricConfig(latest) {
   return {
-    temperature: { baseline: latest.temperature, wander: 0.15, deadband: 0.5, spikeChance: 0.02, spike: () => (Math.random() > 0.5 ? 9 : -66) },
-    windSpeed: { baseline: latest.windSpeed, wander: 1.2, deadband: 3, spikeChance: 0.025, spike: () => 92 + Math.random() * 25 },
+    temperature: { baseline: latest.temperature, wander: 0.15, deadband: 0.5, spikeChance: 0.004, spike: () => (Math.random() > 0.5 ? 9 : -66) },
+    windSpeed: { baseline: latest.windSpeed, wander: 1.2, deadband: 3, spikeChance: 0.004, spike: () => 92 + Math.random() * 25 },
     humidity: { baseline: latest.humidity, wander: 0.6, deadband: 2, spikeChance: 0.01, spike: () => 20 + Math.random() * 10 },
     pressure: { baseline: latest.pressure, wander: 0.4, deadband: 1, spikeChance: 0.01, spike: () => 930 + Math.random() * 8 },
   };

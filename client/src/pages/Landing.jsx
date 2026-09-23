@@ -3,12 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { getStations } from '../api';
 import { PanelLoading, PanelError } from '../components/Shared';
 import StatusBadge from '../components/StatusBadge';
+import { useAuth } from '../context/AuthContext';
 
 export default function Landing() {
   const [stations, setStations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     getStations()
@@ -20,6 +27,14 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-bg px-6 py-10">
       <div className="max-w-4xl mx-auto">
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleLogout}
+            className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted hover:text-slate-100 hover:border-ice transition-colors"
+          >
+            Log out
+          </button>
+        </div>
         <div className="text-center mb-10">
           <div className="text-ice text-sm font-semibold tracking-wide uppercase mb-1">PolarTwin</div>
           <h1 className="text-2xl font-bold text-slate-100">Indian Antarctic Operations Digital Twin Platform</h1>
